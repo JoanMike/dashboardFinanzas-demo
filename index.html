@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Financiero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Librerías para exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="flex h-screen overflow-hidden">
+    <!-- Banner DEMO fijo -->
+    <div class="fixed top-0 left-0 w-full z-50 bg-yellow-400 text-black text-center py-3 px-4 font-semibold shadow-lg">
+        Esta es una DEMO. Puedes usar datos ficticios para probarlo.
+    </div>
+
+    <!-- Ajusta el contenido principal para dejar espacio al banner -->
+    <div id="overlay" class="overlay"></div>
+
+    <aside id="sidebar"
+        class="sidebar w-64 bg-sidebar-dark text-white flex flex-col fixed md:static inset-y-0 left-0 z-40 md:z-auto transition-transform duration-300 ease-in-out md:translate-x-0"
+        style="margin-top:48px;">
+        <div class="flex items-center justify-center h-20 border-b border-gray-700">
+            <i class="fas fa-chart-pie fa-2x mr-2 text-purple-400"></i>
+            <span class="text-2xl font-bold">FinancePro</span>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+            <div>
+                <h3 class="px-3 text-xs font-semibold uppercase text-gray-500 tracking-wider">Resumen</h3>
+                <ul class="mt-2 space-y-1">
+                    <li><a href="#"
+                            class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-sidebar-link-active">
+                            <i class="fas fa-home fa-fw mr-3"></i> Panel Principal</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="px-3 text-xs font-semibold uppercase text-gray-500 tracking-wider">Gestión</h3>
+                <ul class="mt-2 space-y-1">
+                    <li><a href="#"
+                            class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-sidebar-link">
+                            <i class="fas fa-chart-line fa-fw mr-3"></i> Inversiones</a></li>
+                    <li><a href="#"
+                            class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-sidebar-link">
+                            <i class="fas fa-search-dollar fa-fw mr-3"></i> Análisis</a></li>
+                    <li><a href="#"
+                            class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-sidebar-link">
+                            <i class="fas fa-calculator fa-fw mr-3"></i> Presupuesto</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="px-3 text-xs font-semibold uppercase text-gray-500 tracking-wider">Configuración</h3>
+                <ul class="mt-2 space-y-1">
+                    <li><a href="#"
+                            class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-sidebar-link">
+                            <i class="fas fa-cog fa-fw mr-3"></i> Ajustes</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-gray-700">
+            <div class="flex items-center p-3 bg-gray-700 rounded-lg">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/40x40/7F9CF5/EBF4FF?text=JM"
+                    alt="Avatar de Juan Pérez">
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-white">Jose Miguel</p>
+                    <p class="text-xs text-gray-400">Cuenta Premium</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden" style="margin-top:48px;">
+        <!-- Dashboard Header -->
+        <header id="dashboard-header" class="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <button id="sidebar-toggle" class="md:hidden mr-4 text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">Panel Financiero</h1>
+                        <p class="text-sm text-gray-500">Mantén un registro de tu salud financiera y transacciones.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden md:block">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </span>
+                        <input id="search-input" type="text" placeholder="Buscar transacciones..."
+                            class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent">
+                    </div>
+                    <div class="relative">
+                        <button id="notification-button"
+                            class="relative text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                        </button>
+                        <div id="notification-panel"
+                            class="absolute right-0 mt-2 w-80 max-w-sm bg-white rounded-md shadow-lg overflow-hidden z-50 hidden">
+                            <div class="py-2 px-4 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="text-sm font-semibold text-gray-700">Notificaciones</h3>
+                                <button id="mark-all-read-btn"
+                                    class="text-xs text-purple-600 hover:text-purple-800 font-medium focus:outline-none disabled:text-gray-400 disabled:cursor-not-allowed">Marcar
+                                    todas como leídas</button>
+                            </div>
+                            <ul id="notification-list" class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+                                <li id="no-notifications-msg" class="p-4 text-center text-sm text-gray-500 hidden">No
+                                    hay notificaciones nuevas.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button id="add-transaction-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-gradient rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Nueva Transacción
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 md:hidden">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </span>
+                    <input id="search-input-mobile" type="text" placeholder="Buscar transacciones..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent">
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-soft flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-wallet fa-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Balance Total</p>
+                        <p id="total-balance" class="text-2xl font-semibold text-gray-900">$0.00</p>
+                        <p id="balance-percentage" class="text-xs">--% respecto al mes anterior</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-soft flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-arrow-up fa-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Ingresos (Este Mes)</p>
+                        <p id="total-income" class="text-2xl font-semibold text-gray-900">$0.00</p>
+                        <p id="income-percentage" class="text-xs">--% respecto al mes anterior</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-soft flex items-center space-x-4">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-arrow-down fa-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Gastos (Este Mes)</p>
+                        <p id="total-expenses" class="text-2xl font-semibold text-gray-900">$0.00</p>
+                        <p id="expense-percentage" class="text-xs">--% respecto al mes anterior</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-soft mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Comparativo Ingresos vs Gastos</h2>
+                    <div class="flex space-x-1">
+                        <button
+                            class="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 filter-btn active"
+                            data-period="monthly">Mensual</button>
+                        <button
+                            class="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 filter-btn"
+                            data-period="quarterly">Trimestral</button>
+                        <button
+                            class="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 filter-btn"
+                            data-period="annual">Anual</button>
+                    </div>
+                </div>
+                <div class="h-72"> <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-soft mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Transacciones Recientes</h2>
+                    <a href="#" id="view-all-transactions-btn"
+                        class="text-sm font-medium text-purple-600 hover:text-purple-800">Ver Todas <i
+                            class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+
+                <!-- Filtros para transacciones -->
+                <div class="mb-4 flex flex-wrap gap-2 md:gap-4">
+                    <div class="w-full sm:w-auto">
+                        <label for="filter-date-from" class="block text-xs font-medium text-gray-500 mb-1">Desde</label>
+                        <input type="date" id="filter-date-from"
+                            class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <label for="filter-date-to" class="block text-xs font-medium text-gray-500 mb-1">Hasta</label>
+                        <input type="date" id="filter-date-to"
+                            class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <label for="filter-category"
+                            class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+                        <select id="filter-category"
+                            class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <label for="filter-transaction-type"
+                            class="block text-xs font-medium text-gray-500 mb-1">Tipo</label>
+                        <select id="filter-transaction-type"
+                            class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                            <option value="">Todos</option>
+                            <option value="income">Ingresos</option>
+                            <option value="expense">Gastos</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-auto flex items-end">
+                        <button id="apply-filters-btn"
+                            class="w-full sm:w-auto px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                            <i class="fas fa-filter mr-1"></i> Aplicar
+                        </button>
+                        <button id="clear-filters-btn"
+                            class="w-full sm:w-auto ml-2 px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            <i class="fas fa-times mr-1"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr class="text-left text-xs font-semibold uppercase text-gray-500 border-b">
+                                <th class="py-3 px-4">Transacción</th>
+                                <th class="py-3 px-4">Categoría</th>
+                                <th class="py-3 px-4">Fecha</th>
+                                <th class="py-3 px-4 text-right">Monto</th>
+                                <th class="py-3 px-4 text-center">Estado</th>
+                                <th class="py-3 px-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody" class="text-sm text-gray-700">
+                        </tbody>
+                    </table>
+                    <p id="no-transactions-msg" class="text-center text-gray-500 py-4 hidden">No se encontraron
+                        transacciones.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-soft">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-md font-semibold text-gray-800">Gastos por Categoría</h3>
+                    </div>
+                    <div class="h-48 flex justify-center items-center mb-4"> <canvas id="expenseCategoryChart"></canvas>
+                    </div>
+                    <ul id="category-legend" class="text-xs space-y-1 text-gray-600">
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-soft">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-md font-semibold text-gray-800">Meta de Ahorro</h3>
+                        <button id="edit-savings-btn" class="text-sm font-medium text-purple-600 hover:text-purple-800">
+                            <i class="fas fa-edit"></i> Editar Meta
+                        </button>
+                    </div>
+
+                    <!-- Panel superior con información adicional de ahorro -->
+                    <div class="mb-4 p-3 bg-teal-50 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-piggy-bank text-teal-600 mr-2"></i>
+                            <h4 class="text-sm font-medium text-teal-800">Progreso de Ahorro</h4>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-gray-600">Contribuciones recientes:</p>
+                                <p id="recent-contributions" class="font-semibold">Cargando...</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">Tiempo estimado:</p>
+                                <p id="estimated-completion" class="font-semibold">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="savings-goal-text" class="text-lg font-semibold text-gray-900 mb-2">$0 ahorrado de $10,000
+                        meta</p>
+                    <div class="w-full progress-bar-bg rounded-full h-2.5 mb-2">
+                        <div id="savings-progress-bar" class="progress-bar-fill h-2.5 rounded-full" style="width: 0%">
+                        </div>
+                    </div>
+                    <p id="savings-remaining-text" class="text-sm text-gray-500">$10,000 restantes</p>
+
+                    <!-- Consejo para mejorar ahorro -->
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 flex items-start">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
+                            <span id="savings-tip">Para contribuir a tu meta de ahorro, marca tus transacciones como
+                                "Contribución al ahorro".</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-soft">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-md font-semibold text-gray-800">Facturas Próximas</h3> <button
+                            id="show-bills-report-btn"
+                            class="text-sm font-medium text-purple-600 hover:text-purple-800">Ver Informe <i
+                                class="fas fa-arrow-right ml-1"></i></button>
+                    </div>
+                    <ul id="upcoming-bills-list" class="space-y-3">
+                        <li id="no-bills-msg" class="text-center text-gray-500 py-2">No hay facturas próximas.</li>
+                    </ul>
+
+                    <!-- Nota informativa sobre facturas -->
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
+                            <span>Para añadir facturas recurrentes, marca la opción "Factura periódica" al registrar un
+                                gasto.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Cargar los scripts en el orden correcto -->
+        <script src="js/model.js"></script>
+        <script src="js/charts.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Script para asegurar la navegación entre secciones -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log("Inicializando navegación...");
+
+                // Simplified navigation - only dashboard now
+                const sidebar = document.getElementById('sidebar');
+                const sidebarLinks = sidebar.querySelectorAll('a[href="#"]');
+                const dashboardLink = Array.from(sidebarLinks).find(link => link.textContent.includes('Panel Principal'));
+
+                if (dashboardLink) {
+                    dashboardLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        console.log("Clic en enlace Panel Principal");
+
+                        // Just ensure dashboard is visible and active
+                        if (typeof renderDashboard === 'function') {
+                            renderDashboard();
+                        }
+
+                        window.location.hash = '';
+                    });
+                }
+
+                console.log("Navegación inicializada correctamente");
+            });
+        </script>
+    </div>
+
+    <div id="transaction-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal-btn" class="close-button">&times;</span>
+            <h2 id="modal-title" class="text-xl font-semibold mb-4">Nueva Transacción</h2>
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-id">
+                <div class="mb-4">
+                    <label for="transaction-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    <select id="transaction-type" name="type" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <option value="expense">Gasto</option>
+                        <option value="income">Ingreso</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="transaction-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" id="transaction-name" name="name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: Alquiler, Salario">
+                </div>
+                <div class="mb-4">
+                    <label for="transaction-category"
+                        class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                    <select id="transaction-category" name="category" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <!-- Las opciones se cargarán dinámicamente según el tipo de transacción -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="transaction-date" class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    <input type="date" id="transaction-date" name="date" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                </div>
+                <div class="mb-4">
+                    <label for="transaction-amount" class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+                    <input type="number" id="transaction-amount" name="amount" required step="0.01"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: 1500.00">
+                </div>
+                <div class="mb-6">
+                    <label for="transaction-status" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select id="transaction-status" name="status" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <option value="Completado">Completado</option>
+                        <option value="Pendiente">Pendiente</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="savings-contribution" name="savings-contribution" type="checkbox"
+                                class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="savings-contribution" class="font-medium text-gray-700">Contribución al
+                                ahorro</label>
+                            <p class="text-gray-500">Marca esta opción si esta transacción contribuye a tu meta de
+                                ahorro.<br>
+                                <span class="text-xs">Los ingresos marcados aumentarán tu ahorro y los gastos lo
+                                    disminuirán.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-6 recurring-bill-section">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="is-bill" name="is-bill" type="checkbox"
+                                class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="is-bill" class="font-medium text-gray-700">Factura periódica</label>
+                            <p class="text-gray-500">Marca esta opción si este gasto es una factura que se repite
+                                periódicamente</p>
+                        </div>
+                    </div>
+                    <div id="bill-frequency-container" class="mt-3 ml-7 hidden">
+                        <label for="bill-frequency"
+                            class="block text-sm font-medium text-gray-700 mb-1">Frecuencia</label>
+                        <select id="bill-frequency" name="frequency"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                            <option value="monthly">Mensual</option>
+                            <option value="bimonthly">Bimestral</option>
+                            <option value="quarterly">Trimestral</option>
+                            <option value="semiannual">Semestral</option>
+                            <option value="annual">Anual</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-btn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="save-transaction-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Guardar
+                        Transacción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar transacciones -->
+    <div id="delete-confirmation-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span id="close-delete-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Eliminar Transacción</h2>
+            <p class="mb-6 text-gray-600">¿Estás seguro de que deseas eliminar esta transacción? Esta acción no se puede
+                deshacer.</p>
+            <input type="hidden" id="delete-transaction-id">
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-delete-btn"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                <button type="button" id="confirm-delete-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar la meta de ahorro -->
+    <div id="savings-goal-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span id="close-savings-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Editar Meta de Ahorro</h2>
+            <form id="savings-goal-form">
+                <div class="mb-4">
+                    <label for="savings-goal-amount" class="block text-sm font-medium text-gray-700 mb-1">Meta de
+                        Ahorro</label>
+                    <input type="number" id="savings-goal-amount" name="goal" required step="0.01"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: 10000">
+                </div>
+                <div class="mb-4">
+                    <label for="current-savings-amount" class="block text-sm font-medium text-gray-700 mb-1">Ahorrado
+                        Actualmente</label>
+                    <input type="number" id="current-savings-amount" name="current" required step="0.01"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: 5000">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancel-savings-btn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="save-savings-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Avisos Genéricos -->
+    <div id="alert-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span id="close-alert-modal-btn" class="close-button">&times;</span>
+            <h2 id="alert-modal-title" class="text-xl font-semibold mb-4">Aviso</h2>
+            <p id="alert-modal-message" class="mb-6 text-gray-600">Este es un mensaje de aviso.</p>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="alert-modal-ok-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Informe Detallado de Facturas Próximas -->
+    <div id="bills-report-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px; width: 90%;">
+            <span id="close-bills-report-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Informe Detallado de Facturas Próximas</h2>
+
+            <!-- Filtros y Controles -->
+            <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-medium mb-2 text-gray-700">Filtros y Controles</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="bills-report-period"
+                            class="block text-xs font-medium text-gray-500 mb-1">Periodo</label>
+                        <div class="flex space-x-2">
+                            <select id="bills-report-months"
+                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                                <option value="3">3 meses</option>
+                                <option value="6" selected>6 meses</option>
+                                <option value="12">12 meses</option>
+                                <option value="24">24 meses</option>
+                            </select>
+                            <select id="bills-report-year"
+                                class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                                <!-- Las opciones de año se generarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="bills-report-category"
+                            class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+                        <select id="bills-report-category"
+                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md">
+                            <option value="">Todas</option>
+                            <!-- Las opciones se generarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bills-report-search"
+                            class="block text-xs font-medium text-gray-500 mb-1">Buscar</label>
+                        <input type="text" id="bills-report-search" placeholder="Buscar por nombre..."
+                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div class="flex justify-between mt-4">
+                    <div class="export-buttons flex space-x-2">
+                        <button id="export-excel-btn"
+                            class="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center">
+                            <i class="fas fa-file-excel mr-1"></i> Exportar a Excel
+                        </button>
+                        <button id="export-pdf-btn"
+                            class="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center">
+                            <i class="fas fa-file-pdf mr-1"></i> Exportar a PDF
+                        </button>
+                    </div>
+                    <button id="apply-bills-report-filters-btn"
+                        class="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                        <i class="fas fa-filter mr-1"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de Facturas -->
+            <div class="overflow-x-auto mb-4">
+                <table class="w-full table-auto" id="bills-report-table">
+                    <thead>
+                        <tr class="text-left text-xs font-semibold uppercase text-gray-500 border-b">
+                            <th class="py-3 px-4 cursor-pointer hover:bg-gray-50" data-sort="date">
+                                Fecha <i class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 cursor-pointer hover:bg-gray-50" data-sort="name">
+                                Nombre <i class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 cursor-pointer hover:bg-gray-50" data-sort="category">
+                                Categoría <i class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 cursor-pointer hover:bg-gray-50" data-sort="frequency">
+                                Frecuencia <i class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-right cursor-pointer hover:bg-gray-50" data-sort="amount">
+                                Monto <i class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bills-report-tbody" class="text-sm text-gray-700">
+                        <!-- El contenido se generará dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="no-bills-report-msg" class="text-center text-gray-500 py-4 hidden">No se encontraron facturas
+                    para el periodo seleccionado.</p>
+            </div>
+
+            <!-- Calendario de Pagos -->
+            <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div class="p-4 border-b">
+                    <h3 class="text-sm font-semibold text-gray-700">Calendario de Pagos</h3>
+                </div>
+                <div class="p-4">
+                    <!-- Navegación del calendario -->
+                    <div class="flex justify-between items-center mb-3">
+                        <button id="prev-month-btn" class="text-purple-600 hover:text-purple-800">
+                            <i class="fas fa-chevron-left"></i> Mes anterior
+                        </button>
+                        <h4 id="calendar-month-year" class="text-sm font-medium">Mayo 2025</h4>
+                        <button id="next-month-btn" class="text-purple-600 hover:text-purple-800">
+                            Mes siguiente <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Calendario -->
+                        <div class="calendar-container">
+                            <div class="calendar-header grid grid-cols-7 gap-1 text-center">
+                                <div class="text-xs font-medium text-gray-500">Dom</div>
+                                <div class="text-xs font-medium text-gray-500">Lun</div>
+                                <div class="text-xs font-medium text-gray-500">Mar</div>
+                                <div class="text-xs font-medium text-gray-500">Mié</div>
+                                <div class="text-xs font-medium text-gray-500">Jue</div>
+                                <div class="text-xs font-medium text-gray-500">Vie</div>
+                                <div class="text-xs font-medium text-gray-500">Sáb</div>
+                            </div>
+                            <div id="calendar-days" class="calendar-body grid grid-cols-7 gap-1 mt-1">
+                                <!-- Los días del calendario se generarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Detalle de facturas del día seleccionado -->
+                        <div id="day-detail" class="day-detail bg-gray-50 p-4 rounded-lg">
+                            <h4 id="selected-date" class="text-sm font-medium mb-2">Facturas para el 18 de Mayo</h4>
+                            <div id="day-bills-list" class="space-y-2 max-h-60 overflow-y-auto">
+                                <!-- Las facturas del día seleccionado se mostrarán aquí -->
+                                <p class="text-gray-500 text-sm">Selecciona un día para ver sus facturas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análisis de Gastos Recurrentes -->
+            <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div class="p-4 border-b">
+                    <h3 class="text-sm font-semibold text-gray-700">Análisis de Gastos Recurrentes</h3>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-4">
+                    <!-- Gráfico por Categoría -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-600 mb-2">Desglose por Categoría</h4>
+                        <div class="h-64">
+                            <canvas id="bills-category-chart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Comparativa Histórica -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-600 mb-2">Tendencia Histórica <span
+                                class="text-xs font-normal text-gray-400">(últimos 6 meses)</span></h4>
+                        <div class="h-64">
+                            <canvas id="bills-trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t bg-gray-50">
+                    <div id="spending-insights" class="text-sm">
+                        <!-- Los insights se generarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Totales -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-medium mb-3 text-gray-700">Resumen de Totales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 mb-1">Próximos 30 días</p>
+                        <p id="total-30-days" class="text-md font-semibold">$0.00</p>
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 mb-1">Próximo bimestre</p>
+                        <p id="total-bimonthly" class="text-md font-semibold">$0.00</p>
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 mb-1">Próximo trimestre</p>
+                        <p id="total-quarterly" class="text-md font-semibold">$0.00</p>
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 mb-1">Próximo semestre</p>
+                        <p id="total-semiannual" class="text-md font-semibold">$0.00</p>
+                    </div>
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 mb-1">Próximo año</p>
+                        <p id="total-annual" class="text-md font-semibold">$0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de cierre al final del modal -->
+            <div class="flex justify-center mt-6">
+                <button id="close-bills-report-bottom-btn"
+                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 shadow-md transition duration-200">
+                    <i class="fas fa-times-circle mr-2"></i> Cerrar Informe
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Todas las Transacciones -->
+    <div id="all-transactions-modal" class="modal">
+        <div class="modal-content" style="max-width: 90%; width: 1000px; max-height: 85vh;">
+            <span id="close-all-transactions-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Todas las Transacciones</h2>
+
+            <!-- Filtros para transacciones - Idénticos a los de la sección principal -->
+            <div class="mb-4 flex flex-wrap gap-2 md:gap-4">
+                <div class="w-full sm:w-auto">
+                    <label for="modal-filter-date-from"
+                        class="block text-xs font-medium text-gray-500 mb-1">Desde</label>
+                    <input type="date" id="modal-filter-date-from"
+                        class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                </div>
+                <div class="w-full sm:w-auto">
+                    <label for="modal-filter-date-to" class="block text-xs font-medium text-gray-500 mb-1">Hasta</label>
+                    <input type="date" id="modal-filter-date-to"
+                        class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                </div>
+                <div class="w-full sm:w-auto">
+                    <label for="modal-filter-category"
+                        class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+                    <select id="modal-filter-category"
+                        class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <label for="modal-filter-transaction-type"
+                        class="block text-xs font-medium text-gray-500 mb-1">Tipo</label>
+                    <select id="modal-filter-transaction-type"
+                        class="w-full sm:w-40 px-2 py-1 text-sm border border-gray-300 rounded-md">
+                        <option value="">Todos</option>
+                        <option value="income">Ingresos</option>
+                        <option value="expense">Gastos</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto flex items-end">
+                    <button id="modal-apply-filters-btn"
+                        class="w-full sm:w-auto px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                        <i class="fas fa-filter mr-1"></i> Aplicar
+                    </button>
+                    <button id="modal-clear-filters-btn"
+                        class="w-full sm:w-auto ml-2 px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                        <i class="fas fa-times mr-1"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[calc(85vh-180px)]"> <!-- Altura máxima para permitir scroll vertical -->
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr
+                            class="text-left text-xs font-semibold uppercase text-gray-500 border-b sticky top-0 bg-white">
+                            <th class="py-3 px-4">Transacción</th>
+                            <th class="py-3 px-4">Categoría</th>
+                            <th class="py-3 px-4">Fecha</th>
+                            <th class="py-3 px-4 text-right">Monto</th>
+                            <th class="py-3 px-4 text-center">Estado</th>
+                            <th class="py-3 px-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-transactions-tbody" class="text-sm text-gray-700">
+                        <!-- Contenido generado dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="modal-no-transactions-msg" class="text-center text-gray-500 py-4 hidden">No se encontraron
+                    transacciones.</p>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button id="export-transactions-pdf-btn"
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md transition duration-200 mr-3">
+                    <i class="fas fa-file-pdf mr-2"></i> Exportar a PDF
+                </button>
+                <button id="close-all-transactions-bottom-btn"
+                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 shadow-md transition duration-200">
+                    <i class="fas fa-times-circle mr-2"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Cuenta -->
+    <div id="account-form-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-account-form-modal-btn" class="close-button">&times;</span>
+            <h2 id="account-modal-title" class="text-xl font-semibold mb-4">Nueva Cuenta</h2>
+            <form id="account-form">
+                <input type="hidden" id="account-id-input">
+                <div class="mb-3">
+                    <label for="account-name-input" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la
+                        Cuenta</label>
+                    <input type="text" id="account-name-input" name="name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: Banco Principal, Ahorros Viaje">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label for="account-type-input" class="block text-sm font-medium text-gray-700 mb-1">Tipo de
+                            Cuenta</label>
+                        <select id="account-type-input" name="type" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="account-balance-input" class="block text-sm font-medium text-gray-700 mb-1">Balance
+                            Inicial</label>
+                        <input type="number" id="account-balance-input" name="balance" step="0.01" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            placeholder="Ej: 1000.00">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label for="account-currency-input"
+                            class="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
+                        <select id="account-currency-input" name="currency"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                            <option value="PEN" selected>PEN (S/)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="USD">USD ($)</option>
+                            <!-- Otras monedas -->
+                        </select>
+                    </div>
+                    <div id="account-limit-container" class="hidden">
+                        <label for="account-limit-input" class="block text-sm font-medium text-gray-700 mb-1">Límite de
+                            Crédito</label>
+                        <input type="number" id="account-limit-input" name="limit" step="0.01"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            placeholder="Ej: 2000.00">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="account-color-input" class="block text-sm font-medium text-gray-700 mb-1">Color de
+                        Etiqueta</label>
+                    <input type="color" id="account-color-input" name="color" value="#3b82f6"
+                        class="w-full h-10 px-1 py-1 border border-gray-300 rounded-md">
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input id="account-is-main-checkbox" name="isMain" type="checkbox"
+                        class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 rounded">
+                    <label for="account-is-main-checkbox" class="ml-2 block text-sm text-gray-900">Establecer como
+                        cuenta principal</label>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-account-form-btn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="save-account-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Guardar
+                        Cuenta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Transacción de Cuenta -->
+    <div id="account-transaction-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-account-transaction-modal-btn" class="close-button">&times;</span>
+            <h2 id="account-transaction-modal-title" class="text-xl font-semibold mb-4">Nueva Transacción de Cuenta</h2>
+            <form id="account-transaction-form">
+                <input type="hidden" id="account-transaction-id-input">
+                <input type="hidden" id="account-transaction-accountId-input">
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta: <span
+                            id="modal-account-name-display" class="font-semibold"></span></label>
+                </div>
+                <div class="mb-3">
+                    <label for="account-transaction-type-input"
+                        class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    <select id="account-transaction-type-input" name="type" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Gasto</option>
+                        <!-- <option value="transfer">Transferencia</option> No se maneja aquí directamente, sino en modal de transferencia -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="account-transaction-name-input"
+                        class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <input type="text" id="account-transaction-name-input" name="name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: Compra online, Depósito">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label for="account-transaction-amount-input"
+                            class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+                        <input type="number" id="account-transaction-amount-input" name="amount" step="0.01" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            placeholder="Ej: 50.00">
+                    </div>
+                    <div>
+                        <label for="account-transaction-date-input"
+                            class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                        <input type="date" id="account-transaction-date-input" name="date" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="account-transaction-category-input"
+                        class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                    <select id="account-transaction-category-input" name="category" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <!-- Opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="account-transaction-status-input"
+                        class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select id="account-transaction-status-input" name="status" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <option value="Completado">Completado</option>
+                        <option value="Pendiente">Pendiente</option>
+                    </select>
+                </div>
+                <div class="mb-4 flex items-center">
+                    <input id="account-transaction-affects-savings-checkbox" name="affectsSavingsGoal" type="checkbox"
+                        class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300 rounded">
+                    <label for="account-transaction-affects-savings-checkbox"
+                        class="ml-2 block text-sm text-gray-900">Afecta a la meta de ahorro global</label>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-account-transaction-btn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="save-account-transaction-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Guardar
+                        Transacción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Transferencias entre Cuentas -->
+    <div id="transfer-funds-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-transfer-funds-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Transferir Fondos</h2>
+            <form id="transfer-funds-form">
+                <div class="mb-3">
+                    <label for="transfer-from-account-select" class="block text-sm font-medium text-gray-700 mb-1">Desde
+                        Cuenta</label>
+                    <select id="transfer-from-account-select" name="fromAccountId" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <!-- Opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="transfer-to-account-select" class="block text-sm font-medium text-gray-700 mb-1">Hacia
+                        Cuenta</label>
+                    <select id="transfer-to-account-select" name="toAccountId" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                        <!-- Opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label for="transfer-amount-input" class="block text-sm font-medium text-gray-700 mb-1">Monto a
+                            Transferir</label>
+                        <input type="number" id="transfer-amount-input" name="amount" step="0.01" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            placeholder="Ej: 100.00">
+                    </div>
+                    <div>
+                        <label for="transfer-date-input"
+                            class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                        <input type="date" id="transfer-date-input" name="date" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="transfer-description-input"
+                        class="block text-sm font-medium text-gray-700 mb-1">Descripción (Opcional)</label>
+                    <input type="text" id="transfer-description-input" name="description"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        placeholder="Ej: Ahorro mensual">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-transfer-funds-btn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="confirm-transfer-funds-btn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Realizar
+                        Transferencia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar cuentas -->
+    <div id="delete-account-confirmation-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span id="close-delete-account-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Eliminar Cuenta</h2>
+            <p id="delete-account-warning-msg" class="mb-6 text-gray-600">¿Estás seguro de que deseas eliminar esta
+                cuenta? Esta acción no se puede deshacer.</p>
+            <input type="hidden" id="delete-account-id-input">
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-delete-account-btn"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                <button type="button" id="confirm-delete-account-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar transacciones de cuenta -->
+    <div id="delete-account-transaction-confirmation-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span id="close-delete-account-transaction-modal-btn" class="close-button">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Eliminar Transacción</h2>
+            <p class="mb-6 text-gray-600">¿Estás seguro de que deseas eliminar esta transacción de la cuenta? Esta
+                acción no se puede deshacer.</p>
+            <input type="hidden" id="delete-account-transaction-id-input">
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancel-delete-account-transaction-btn"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancelar</button>
+                <button type="button" id="confirm-delete-account-transaction-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Cargar los scripts en el orden correcto -->
+    <script src="js/model.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Script para asegurar la navegación entre secciones -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("Inicializando navegación...");
+
+            // Simplified navigation - only dashboard now
+            const sidebar = document.getElementById('sidebar');
+            const sidebarLinks = sidebar.querySelectorAll('a[href="#"]');
+            const dashboardLink = Array.from(sidebarLinks).find(link => link.textContent.includes('Panel Principal'));
+
+            if (dashboardLink) {
+                dashboardLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log("Clic en enlace Panel Principal");
+
+                    // Just ensure dashboard is visible and active
+                    if (typeof renderDashboard === 'function') {
+                        renderDashboard();
+                    }
+
+                    window.location.hash = '';
+                });
+            }
+
+            console.log("Navegación inicializada correctamente");
+        });
+    </script>
+</body>
+
+</html>

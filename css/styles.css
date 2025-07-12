@@ -1,0 +1,573 @@
+/* Estilo personalizado para la fuente Inter y colores */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F9FAFB;
+    /* Fondo claro */
+}
+
+/* Colores personalizados de Tailwind */
+.bg-sidebar-dark {
+    background-color: #1F2937;
+}
+
+.text-sidebar-link {
+    color: #9CA3AF;
+}
+
+.text-sidebar-link-active {
+    color: #FFFFFF;
+    background-color: #374151;
+}
+
+.text-sidebar-link:hover {
+    color: #FFFFFF;
+    background-color: #4B5563;
+}
+
+.bg-purple-gradient {
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+}
+
+.bg-purple-gradient:hover {
+    background-image: linear-gradient(to right, #7C3AED, #4F46E5);
+}
+
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.badge-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-pending {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.progress-bar-bg {
+    background-color: #E5E7EB;
+}
+
+.progress-bar-fill {
+    background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
+    transition: width 1s ease-in-out;
+}
+
+/* Estilos para ocultar/mostrar sidebar en móvil */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        position: fixed;
+        height: 100%;
+        z-index: 40;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        transition: margin-left 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 30;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+        display: block;
+        opacity: 1;
+    }
+}
+
+@media (min-width: 769px) {
+    .sidebar-toggle-button {
+        display: none;
+        /* Hide hamburger on larger screens */
+    }
+}
+
+/* Estilos para el Modal */
+.modal {
+    display: flex;
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0);
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.modal.show {
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 24px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Estilo para botones de acción en tabla */
+.action-btn {
+    cursor: pointer;
+    margin: 0 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.edit-btn {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+}
+
+.edit-btn:hover {
+    background-color: #bfdbfe;
+}
+
+.delete-btn {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.delete-btn:hover {
+    background-color: #fecaca;
+}
+
+/* Estilos para el Panel de Notificaciones */
+.notification-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    position: relative;
+    /* Para posicionar el punto de no leído */
+}
+
+.notification-item:hover {
+    background-color: #F3F4F6;
+    /* Gris claro al pasar el ratón */
+}
+
+.notification-item.unread {
+    background-color: #EFF6FF;
+    /* Azul muy claro para no leídos */
+    font-weight: 500;
+    /* Un poco más de énfasis */
+}
+
+.notification-item .mark-read-btn {
+    color: #9CA3AF;
+    /* Gris */
+    font-size: 0.75rem;
+    /* Más pequeño */
+    margin-left: 8px;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.notification-item:hover .mark-read-btn {
+    opacity: 1;
+    /* Mostrar al pasar el ratón */
+}
+
+.notification-item.unread .mark-read-btn {
+    opacity: 1;
+    /* Siempre visible si no está leído */
+    color: #6B7280;
+    /* Un gris más oscuro */
+}
+
+.notification-timestamp {
+    font-size: 0.75rem;
+    color: #6B7280;
+    /* Gris */
+    margin-top: 2px;
+    display: block;
+    /* Asegurar que esté en nueva línea si es necesario */
+}
+
+/* Animación para panel de notificaciones */
+#notification-panel {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+    visibility: hidden;
+}
+
+#notification-panel.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Animación de ping para el badge de notificación */
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.animate-ping {
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Estilos para la sección de ahorro */
+.savings-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background-color: #99f6e4;
+    color: #0f766e;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.savings-badge:hover {
+    background-color: #5eead4;
+}
+
+.savings-badge i {
+    margin-right: 4px;
+}
+
+/* Panel de progreso de ahorro */
+.savings-progress-panel {
+    background-color: #f0fdfa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccfbf1;
+    transition: box-shadow 0.3s ease;
+}
+
+.savings-progress-panel:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.savings-tip {
+    color: #6b7280;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.savings-tip i {
+    color: #fbbf24;
+    margin-right: 0.5rem;
+    margin-top: 0.125rem;
+}
+
+/* Estilos para etiquetas de categoría en la tabla de transacciones */
+.category-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    color: #ffffff;
+    /* Texto blanco para todas las categorías */
+    transition: transform 0.2s ease;
+}
+
+.category-badge:hover {
+    transform: translateY(-1px);
+}
+
+/* Colores de categorías - Gastos */
+.category-Alimentación {
+    background-color: #22c55e;
+    /* Verde más vibrante */
+}
+
+.category-Vivienda {
+    background-color: #8b5cf6;
+    /* Púrpura más vibrante */
+}
+
+.category-Transporte {
+    background-color: #3b82f6;
+    /* Azul más vibrante */
+}
+
+.category-Entretenimiento {
+    background-color: #f59e0b;
+    /* Naranja más vibrante */
+}
+
+.category-Salud {
+    background-color: #10b981;
+    /* Verde-turquesa más vibrante */
+}
+
+.category-Educación {
+    background-color: #ec4899;
+    /* Rosa más vibrante */
+}
+
+.category-Ropa {
+    background-color: #a855f7;
+    /* Púrpura-rosa más vibrante */
+}
+
+.category-Inversión {
+    background-color: #6366f1;
+    /* Índigo más vibrante */
+}
+
+.category-Servicios {
+    background-color: #e879f9;
+    /* Fucsia vibrante */
+}
+
+.category-Seguros {
+    background-color: #eab308;
+    /* Amarillo más vibrante */
+}
+
+.category-Deudas {
+    background-color: #ef4444;
+    /* Rojo más vibrante */
+}
+
+.category-Otros {
+    background-color: #6b7280;
+    /* Gris más vibrante */
+}
+
+/* Colores de categorías - Ingresos */
+.category-Salario {
+    background-color: #16a34a;
+    /* Verde intenso */
+}
+
+.category-Ingresos-Freelance {
+    background-color: #2563eb;
+    /* Azul intenso */
+}
+
+.category-Inversiones {
+    background-color: #db2777;
+    /* Rosa intenso */
+}
+
+.category-Regalos {
+    background-color: #9333ea;
+    /* Púrpura intenso */
+}
+
+.category-Reembolsos {
+    background-color: #0891b2;
+    /* Cian intenso */
+}
+
+.category-Alquileres {
+    background-color: #4f46e5;
+    /* Índigo intenso */
+}
+
+.category-Ventas {
+    background-color: #d97706;
+    /* Ámbar intenso */
+}
+
+/* Estilos para las facturas próximas */
+.pay-bill-btn {
+    transition: all 0.2s ease;
+    opacity: 0.9;
+}
+
+.pay-bill-btn:hover {
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+/* Animación al pagar una factura */
+@keyframes billPaid {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.bill-paid {
+    animation: billPaid 0.5s ease forwards;
+}
+
+/* Estilos para el calendario de pagos */
+.calendar-container {
+    width: 100%;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f3f4f6;
+}
+
+.calendar-day.inactive {
+    color: #9ca3af;
+}
+
+.calendar-day.today {
+    font-weight: 600;
+    border: 1px solid #8b5cf6;
+    color: #8b5cf6;
+}
+
+.calendar-day.selected {
+    background-color: #8b5cf6;
+    color: white;
+}
+
+.calendar-day.has-bills {
+    position: relative;
+}
+
+.calendar-day.has-bills:after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #ef4444;
+}
+
+.calendar-day.selected.has-bills:after {
+    background-color: white;
+}
+
+.calendar-day .bill-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilos para la sección de detalle del día */
+.day-detail {
+    margin-top: 1rem;
+}
+
+.day-bill-item {
+    display: flex;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    transition: transform 0.2s;
+}
+
+.day-bill-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Mejora la alineación del calendario en pantallas pequeñas */
+@media (max-width: 1024px) {
+    .calendar-container {
+        margin-bottom: 1rem;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
