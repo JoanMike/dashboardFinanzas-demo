@@ -1,4 +1,4 @@
-# 📊 FinancePro - Dashboard Financiero
+# 📊 FinancePro - Dashboard Financiero (DEMO)
 
 ![FinancePro Dashboard](https://img.shields.io/badge/Version-1.0.0-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0+-blue)
 
