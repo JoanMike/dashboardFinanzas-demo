@@ -4,6 +4,8 @@
 
 **FinancePro** es una aplicación web moderna y responsive para la gestión personal de finanzas. Permite a los usuarios llevar un control detallado de sus ingresos, gastos, ahorros y facturas periódicas con una interfaz intuitiva y visualizaciones interactivas.
 
+<img width="1911" height="1803" alt="dashboardFinanzas-demo-2025-07-12-00_32_09" src="https://github.com/user-attachments/assets/4afb0dad-0d00-4db9-87da-ceaeefd9916a" />
+
 ## ✨ Características Principales
 
 ### 🎯 **Panel Principal**
